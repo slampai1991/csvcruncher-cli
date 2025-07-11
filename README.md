@@ -14,7 +14,7 @@
    ```
 2. Запустите скрипт:
    ```bash
-   python csvcruncher.py --file products.csv [--where <условие>] [--aggregate <колонка=операция>] [--order-by <колонка=asc|desc>] [--head N]
+   python csvcruncher.py --file products.csv [--where <условие>] [--aggregate <колонка=операция>] [--order-by <колонка=asc|desc>]
    ```
 
 ## Примеры
