@@ -21,11 +21,11 @@
 ## Примеры
 - Вывести первые 5 строк:
   ```bash
-  python csvcruncher.py --file products.csv
+  python csvcruncher.py --file products.csv --head 5
   ```
 - Фильтрация:
   ```bash
-  python csvcruncher.py --file products.csv --where price>100 --head 5
+  python csvcruncher.py --file products.csv --where price>100
   ```
 - Агрегация:
   ```bash
