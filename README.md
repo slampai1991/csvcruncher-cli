@@ -38,5 +38,5 @@
 ## Тесты
 Запуск тестов:
 ```bash
-pytest
+pytest --maxfail=1 --disable-warnings -v
 ```
