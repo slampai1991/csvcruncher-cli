@@ -14,6 +14,7 @@
 import csv
 import argparse
 import re
+from datetime import datetime
 from statistics import mean
 import tabulate
 
@@ -44,7 +45,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def csv_reader(file_path: str) -> list[dict[str, str]]:
+def csv_reader(file_path: str) -> list[dict[str, str]] | None:
     """
     Читает данные из переданного csv-файла.
 
@@ -58,7 +59,7 @@ def csv_reader(file_path: str) -> list[dict[str, str]]:
         return data
     except Exception as e:
         print(f"Не удалось прочитать файл: {e}")
-        return []
+        return
 
 
 def filter_by(data: list[dict[str, str]], condition: str) -> list[dict[str, str]]:
@@ -74,19 +75,19 @@ def filter_by(data: list[dict[str, str]], condition: str) -> list[dict[str, str]
     """
     if "<" in condition:
         column, value = condition.split("<")
-        if re.match(r"\d+\.\d+", value):
+        if re.match(r"\d+\.*\d*", value):
             return [row for row in data if float(row[column]) < float(value)]
         else:
             return [row for row in data if row[column] < value]
     elif ">" in condition:
         column, value = condition.split(">")
-        if re.match(r"\d+\.\d+", value):
+        if re.match(r"\d+\.*\d*", value):
             return [row for row in data if float(row[column]) > float(value)]
         else:
             return [row for row in data if row[column] > value]
     elif "=" in condition:
         column, value = condition.split("=")
-        if re.match(r"\d+\.\d+", value):
+        if re.match(r"\d+\.*\d*", value):
             return [row for row in data if float(row[column]) == float(value)]
         else:
             return [row for row in data if row[column] == value]
@@ -192,8 +193,8 @@ def cli():
     if args.where:
         try:
             result = filter_by(data, args.where)
-        except ValueError:
-            print("Неверный формат условия where. Используйте: column=value")
+        except Exception as e:
+            print(f"Ошибка выполнения операции: {e}")
             return
 
     # Применяем агрегацию если указан параметр aggregate
@@ -204,13 +205,17 @@ def cli():
             if result:
                 print(tabulate.tabulate([result], headers="keys"))
             return
-        except ValueError:
-            print("Неверный формат агрегации. Используйте: operation=column")
+        except Exception as e:
+            print(f"Ошибка выполнения операции: {e}")
             return
 
     # Применяем сортировку если указан параметр order-by
     if args.order_by:
-        result = sort_by(data, args.order_by)
+        try:
+            result = sort_by(data, args.order_by)
+        except Exception as e:
+            print(f"Ошибка выполнения операции: {e}")
+            return
 
     # Выводим результат
     if result:

@@ -46,6 +46,10 @@ yarn.lock
 # Cache directories
 .cache/
 .npm/
+__pycache__/
+*.py[cod]
 
 csvcrunch-venv
 products.csv
+.venv
+
