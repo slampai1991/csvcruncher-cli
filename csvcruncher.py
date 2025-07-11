@@ -8,14 +8,12 @@
   - сортировка (order by <имя колонки для сортировки>)
 
 
-
 """
 
 import csv
 import argparse
 import re
-from datetime import datetime
-from statistics import mean
+from statistics import mean, median
 import tabulate
 
 
@@ -27,6 +25,7 @@ def parse_args():
         argparse.Namespace:
             Объект с атрибутами:
               - file (str): Путь к CSV файлу для обработки
+              - head (int): Количество отображаемых записей
               - where (str, optional): Условие фильтрации по колонке
               - aggregate (str, optional): Операция агрегации по колонке
               - order_by (str, optional): Колонка для сортировки
@@ -35,6 +34,7 @@ def parse_args():
     parser.add_argument(
         "--file", required=True, help="Имя или путь к файлу для обработки"
     )
+    parser.add_argument("--head", help="Количество отображаемых записей")
     parser.add_argument("--where", help="Фильтрация по условию - `column{=<>}value`")
     parser.add_argument(
         "--aggregate", help="Агрегация по уловию `column={min/max/avg}`"
@@ -103,6 +103,7 @@ def aggregate(
       - avg (среднее значение по колонке)
       - min (минимальное по колонке)
       - max (максимально по колонке)
+      - median (медиана по колонке)
 
     Args:
         data (list[dict[str, str]]): Данные для обработки
@@ -112,7 +113,7 @@ def aggregate(
     Returns:
         dict[str, str | float] | None:
     """
-    if ops not in ("avg", "min", "max"):
+    if ops not in ("avg", "min", "max", "median"):
         print(f"Операция не поддерживается: {ops}")
         return
 
@@ -129,6 +130,8 @@ def aggregate(
             return {"column": column, "min": min(values)}
         case "max":
             return {"column": column, "max": max(values)}
+        case "median":
+            return {"column": column, "median": median(values)}
 
 
 def sort_by(data: list[dict[str, str]], condition: str) -> list[dict[str, str]]:
@@ -167,50 +170,50 @@ def sort_by(data: list[dict[str, str]], condition: str) -> list[dict[str, str]]:
             print(f"Неизвестный параметр сортировки: {order}")
             return data
 
-
 def cli():
-    """
-    Основной CLI интерфейс для обработки CSV файлов.
-    Поддерживает фильтрацию, агрегацию и сортировку данных.
-    """
     args = parse_args()
 
-    # Читаем данные из CSV
     data = csv_reader(args.file)
-    result = None
+    if not data:
+        print("Нет данных для обработки")
+        return
 
-    # Выводим содержимое файла если указан параметр file
-    if args.file and data:
-        result = data
-    # Применяем фильтрацию если указан параметр where
+    result = data  # начальное значение
+
     if args.where:
         try:
-            result = filter_by(data, args.where)
+            result = filter_by(result, args.where)  # ⬅ здесь и далее используем result
         except Exception as e:
-            print(f"Ошибка выполнения операции: {e}")
+            print(f"Ошибка выполнения операции фильтрации: {e}")
             return
 
-    # Применяем агрегацию если указан параметр aggregate
+    if args.order_by:
+        try:
+            result = sort_by(result, args.order_by)
+        except Exception as e:
+            print(f"Ошибка выполнения сортировки: {e}")
+            return
+
     if args.aggregate:
         try:
             column, operation = args.aggregate.split("=")
-            result = aggregate(data, column.strip(), operation.strip())
-            if result:
-                print(tabulate.tabulate([result], headers="keys"))
-            return
+            agg_result = aggregate(result, column.strip(), operation.strip())
+            if agg_result:
+                print(tabulate.tabulate([agg_result], headers="keys"))
+            return  # агрегация финализирует вывод
         except Exception as e:
-            print(f"Ошибка выполнения операции: {e}")
+            print(f"Ошибка выполнения агрегации: {e}")
             return
 
-    # Применяем сортировку если указан параметр order-by
-    if args.order_by:
+    # Применяем head только после всех других операций
+    if args.head:
         try:
-            result = sort_by(data, args.order_by)
+            result = result[: int(args.head)]
         except Exception as e:
-            print(f"Ошибка выполнения операции: {e}")
+            print(f"Ошибка применения head: {e}")
             return
 
-    # Выводим результат
+    # Выводим итоговую таблицу
     if result:
         print(tabulate.tabulate(result, headers="keys"))
     else:
