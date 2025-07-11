@@ -30,13 +30,11 @@ def parse_args():
               - where (str, optional): Условие фильтрации по колонке
               - aggregate (str, optional): Операция агрегации по колонке
               - order_by (str, optional): Колонка для сортировки
-              - head (int, optional):
     """
     parser = argparse.ArgumentParser(description="CSV Cruncher")
     parser.add_argument(
         "--file", required=True, help="Имя или путь к файлу для обработки"
     )
-    parser.add_argument("--head", help="Количество строк для вывода в начале файла")
     parser.add_argument("--where", help="Фильтрация по условию - `column{=<>}value`")
     parser.add_argument(
         "--aggregate", help="Агрегация по уловию `column={min/max/avg}`"
@@ -182,13 +180,8 @@ def cli():
     result = None
 
     # Выводим содержимое файла если указан параметр file
-    # По умолчанию будет вывод первых 5 строк csv-файла
     if args.file and data:
-        if args.head:
-            result = data[: int(args.head)]
-        else:
-            result = data[:5]
-
+        result = data
     # Применяем фильтрацию если указан параметр where
     if args.where:
         try:

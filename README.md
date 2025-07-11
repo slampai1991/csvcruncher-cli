@@ -1,0 +1,45 @@
+# CSVCruncher CLI
+
+Простой CLI-скрипт для обработки CSV-файлов с поддержкой фильтрации, агрегации и сортировки.
+
+## Возможности
+- Фильтрация по условию (`<`, `>`, `=`)
+- Агрегация (`avg`, `min`, `max`)
+- Сортировка по колонке
+
+## Быстрый старт
+1. Установите зависимости:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Запустите скрипт:
+   ```bash
+   python csvcruncher.py --file products.csv [--where <условие>] [--aggregate <колонка=операция>] [--order-by <колонка=asc|desc>] [--head N]
+   ```
+
+## Примеры
+- Вывести первые 5 строк:
+  ```bash
+  python csvcruncher.py --file products.csv
+  ```
+- Фильтрация:
+  ```bash
+  python csvcruncher.py --file products.csv --where price>100
+  ```
+- Агрегация:
+  ```bash
+  python csvcruncher.py --file products.csv --aggregate price=avg
+  ```
+- Сортировка:
+  ```bash
+  python csvcruncher.py --file products.csv --order-by price=desc
+  ```
+
+## Тесты
+Запуск тестов:
+```bash
+pytest
+```
+
+## Игнорируемые файлы
+В проекте не учитываются виртуальные окружения, временные и кэш-файлы (см. `.gitignore`).
