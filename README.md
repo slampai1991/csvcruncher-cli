@@ -4,8 +4,9 @@
 
 ## Возможности
 - Фильтрация по условию (`<`, `>`, `=`)
-- Агрегация (`avg`, `min`, `max`)
+- Агрегация (`avg`, `min`, `max`, `median`)
 - Сортировка по колонке
+- Ограничение количества отображаемых записей (head)
 
 ## Быстрый старт
 1. Установите зависимости:
@@ -14,7 +15,7 @@
    ```
 2. Запустите скрипт:
    ```bash
-   python csvcruncher.py --file products.csv [--where <условие>] [--aggregate <колонка=операция>] [--order-by <колонка=asc|desc>]
+   python csvcruncher.py --file products.csv [--where <условие>] [--aggregate <колонка=операция>] [--order-by <колонка=asc|desc>] [--head <количество записей>]
    ```
 
 ## Примеры
@@ -24,7 +25,7 @@
   ```
 - Фильтрация:
   ```bash
-  python csvcruncher.py --file products.csv --where price>100
+  python csvcruncher.py --file products.csv --where price>100 --head 5
   ```
 - Агрегация:
   ```bash
